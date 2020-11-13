@@ -24,24 +24,22 @@ class ofApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
 		
-		ofxPanel gui;
-		ofParameter <ofVec3f> uiColor;
-		ofParameter <float> uiThreshold;
-
-		ofxCvColorImage clone_;
-
-		ofShader shader;
-
-		ofVideoGrabber cam; 
-		ofxCv::FlowFarneback flow; 
-		ofMesh mesh; 
-		int stepSize, xSteps, ySteps; 
-
-		ofxCvColorImage img; 
-
-		float distortionStrength; 
-		const int INPUT_MIN = 0, INPUT_MAX = 100; 
-		string msg; 
-
-		ofSerial serial; 
+        ofxPanel gui;
+        ofParameter <ofVec3f> uiColor;
+        ofParameter <float> uiThreshold;
+        
+        ofVideoGrabber camera;
+        ofxCvColorImage clone_;
+        
+        ofxCv::FlowFarneback flow;
+        ofMesh mesh;
+        int stepSize, xSteps, ySteps;
+        float distortionStrength;
+        const int INPUT_MIN = 0, INPUT_MAX = 100;
+        
+        string msg;
+        
+        ofShader shader;
+        
+        ofSerial serial; 
 };
