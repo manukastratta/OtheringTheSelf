@@ -31,3 +31,4 @@
 *.out
 *.app
 otherProject/bin/.DS_Store
+.DS_Store
