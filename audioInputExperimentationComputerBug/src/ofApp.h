@@ -9,7 +9,7 @@ class ofApp : public ofBaseApp{
 		void setup();
 		void update();
 		void draw();
-        void exit();
+        void exit(); // stops audio when you quit
     
         void audioIn(float* input, int bufferSize, int nChannels);
         void audioOut(float* buffer, int bufferSize, int nChannels);
@@ -27,6 +27,6 @@ class ofApp : public ofBaseApp{
 		
         
     int sampleRate;
-    int bufferSize;
+    int bufferSize; // how much audio you're buffering
     vector<float> inputBuffer;
 };

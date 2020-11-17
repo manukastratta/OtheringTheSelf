@@ -7,6 +7,7 @@ void ofApp::setup(){
     
     inputBuffer.resize(bufferSize * 1); // *1 bc 1 input chanel
     
+    // Depricated? (1 and 2 are num channels)
     ofSoundStreamSetup(2, 1, sampleRate, bufferSize, 4); // 4 for number of buffers 
 }
 
@@ -20,15 +21,17 @@ void ofApp::draw(){
 
 }
 
-void ofApp::audioIn(float* input, int bufferSize, int nChannels) { // will be called automatically once buffer is full of audio samples
+void ofApp::audioIn(float* input, int bufferSize, int nChannels) {
+    // will be called automatically once buffer is full of audio samples
     for(int i = 0; i < bufferSize; i++) {
+        // fill up the buffer (keep like this if you ever changed nChannels
         inputBuffer[i*nChannels+0] = input[i];
     }
 }
 
 void ofApp::audioOut(float* buffer, int bufferSize, int nChannels) {
     // take input and push to output!
-    
+    // Onc buffer is filled, call audio out
     for(int i = 0; i < bufferSize; i++) {
         float inputSample;
         float currentSample;
@@ -37,6 +40,7 @@ void ofApp::audioOut(float* buffer, int bufferSize, int nChannels) {
         
         currentSample = inputSample;
         
+        // Left and right speaker
         buffer[i*nChannels+0] = currentSample;
         buffer[i*nChannels + 1] = currentSample;
     }
