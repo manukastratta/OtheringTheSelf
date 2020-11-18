@@ -3,15 +3,32 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
     ofBackground(60);
+    ofSetVerticalSync(true);
     camera.setup(ofGetWindowWidth(), ofGetWindowHeight());
     clone_.allocate(camera.getWidth(), camera.getHeight());
+    
+    // Sound recording and playback
+    soundStreamInput.printDeviceList();
+        
+    bufferSize = 256;
+            
+    soundStreamInput.setup(this, 0, 1, 44100, bufferSize, 4);
+    soundStreamOutput.setup(this, 2, 0, 44100, bufferSize, 4);
 
+    playingBufferOffset = 0;
+    recordingBufferOffset = 0;
+    soundStreamOutput.stop();
+    soundStreamInput.stop();
+
+    // GUI
     gui.setup();
     gui.add(uiColor.set("color", ofVec3f(0, 1, 0), ofVec3f(0, 0, 0), ofVec3f(1, 1, 1)));
     gui.add(uiThreshold.set("threshold", 0.6, 0, 1));
     
+    // Background removal
     shader.load("shader");
     
+    // Distortion
     mesh.setMode(OF_PRIMITIVE_TRIANGLES);
     stepSize = 8;
     ySteps = camera.getHeight() / stepSize;
@@ -37,7 +54,7 @@ void ofApp::setup(){
         }
     }
     
-    // serial
+    // Serial
     serial.setup("/dev/cu.usbmodem14201", 9600);
 
     // Init variables
@@ -47,6 +64,16 @@ void ofApp::setup(){
 //--------------------------------------------------------------
 void ofApp::update(){
     camera.update();
+    
+    // Sound
+    if(playingBufferOffset * bufferSize >= SAMPLE_LENGTH - bufferSize){
+        isPlaying = false;
+        soundStreamOutput.stop();
+    }
+    if(recordingBufferOffset * bufferSize >= SAMPLE_LENGTH - bufferSize){
+        isRecording = false;
+        soundStreamInput.stop();
+    }
     
     // Get ultrasonic data
     if (serial.available() < 0) {
@@ -60,8 +87,8 @@ void ofApp::update(){
             //printf("myByte is %d\n", byteData);
 
             // Use Arduino readings to determine blur of image
-            byteData = INPUT_MAX - byteData;
-            distortionStrength = ofMap(byteData, INPUT_MIN, INPUT_MAX, 0, 2);
+            int distortion = INPUT_MAX - byteData;
+            distortionStrength = ofMap(distortion, INPUT_MIN, INPUT_MAX, 0, 2);
 
             // Update message to print to console
             msg = "Distance: " + ofToString(byteData) + "; DistortionStrength: " + ofToString(distortionStrength);
@@ -104,11 +131,62 @@ void ofApp::draw(){
     shader.end();
     
     gui.draw();
+    
+    ofFill();
+    ofSetColor(60);
+    ofDrawRectangle(20, 180, 150, 40);
+    ofSetColor(255);
+    if(isPlaying){
+        ofDrawBitmapString("PLAYING", 31, 200);
+    }
+    if(isRecording){
+        ofDrawBitmapString("RECORDING", 31, 210);
+    }
+    ofNoFill();
+    
+}
+
+//--------------------------------------------------------------
+void ofApp::audioIn(float * input, int bufferSize, int nChannels){
+    if(isRecording){
+        for (int i = 0; i < bufferSize; i++){
+            recording[i+recordingBufferOffset*bufferSize] = input[i];
+        }
+        recordingBufferOffset++;
+    }
+}
+
+void ofApp::audioOut(float * output, int bufferSize, int nChannels){
+    if (isPlaying) {
+        for (int i = 0; i < bufferSize; i++){
+            output[ i*2+0 ] = recording[i + playingBufferOffset*bufferSize];
+            cout << "Playing" << ofToString(output[ i*2+0 ]) << endl;
+            output[ i*2+1 ] = recording[i + playingBufferOffset*bufferSize];
+        }
+        playingBufferOffset++;
+    }
 }
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
-
+    if( key == 'r' ){
+        if(isRecording) {
+            isRecording = false;
+            soundStreamInput.stop();
+            isPlaying = true;
+            soundStreamOutput.start();
+            playingBufferOffset = 0;
+        }
+        else{
+            if (isPlaying) {
+                isPlaying = false;
+                soundStreamOutput.stop();
+            }
+            isRecording = true;
+            soundStreamInput.start();
+            recordingBufferOffset = 0;
+        }
+    }
 }
 
 //--------------------------------------------------------------

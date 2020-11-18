@@ -5,6 +5,8 @@
 #include "ofxCv.h"
 #include "ofxOpenCv.h"
 
+#define SAMPLE_LENGTH 441000  // ten seconds
+
 class ofApp : public ofBaseApp{
 
 	public:
@@ -24,6 +26,21 @@ class ofApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
     
+        void audioIn(float * input, int bufferSize, int nChannels);
+        void audioOut(float * output, int bufferSize, int nChannels);
+    
+    ofSoundStream soundStreamInput;
+    ofSoundStream soundStreamOutput;
+    
+    float recording[SAMPLE_LENGTH];
+    int recordingBufferOffset;
+    int playingBufferOffset;
+    
+    bool isPlaying;
+    bool isRecording;
+    
+    int bufferSize;
+    
     ofxPanel gui;
     ofParameter <ofVec3f> uiColor;
     ofParameter <float> uiThreshold;
@@ -35,7 +52,7 @@ class ofApp : public ofBaseApp{
     ofMesh mesh;
     int stepSize, xSteps, ySteps;
     float distortionStrength;
-    const int INPUT_MIN = 0, INPUT_MAX = 100;
+    const int INPUT_MIN = 0, INPUT_MAX = 200;
     
     string msg;
     
