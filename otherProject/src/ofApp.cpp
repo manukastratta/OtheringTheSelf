@@ -162,7 +162,7 @@ void ofApp::audioOut(float * output, int bufferSize, int nChannels){
     if (isPlaying) {
         for (int i = 0; i < bufferSize; i++){
             output[ i*2+0 ] = recording[i + playingBufferOffset*bufferSize];
-            cout << "Playing" << ofToString(output[ i*2+0 ]) << endl;
+            cout << "Playing" << endl;
             output[ i*2+1 ] = recording[i + playingBufferOffset*bufferSize];
         }
         playingBufferOffset++;
