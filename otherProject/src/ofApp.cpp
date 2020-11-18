@@ -136,11 +136,13 @@ void ofApp::draw(){
     ofSetColor(60);
     ofDrawRectangle(20, 180, 150, 40);
     ofSetColor(255);
+    ofDrawBitmapString("Click 'r' once to speak", 31, 180);
+    ofDrawBitmapString("Click 'r' again to listen", 31, 200);
     if(isPlaying){
-        ofDrawBitmapString("PLAYING", 31, 200);
+        ofDrawBitmapString("PLAYING", 31, 220);
     }
     if(isRecording){
-        ofDrawBitmapString("RECORDING", 31, 210);
+        ofDrawBitmapString("RECORDING", 31, 230);
     }
     ofNoFill();
     
